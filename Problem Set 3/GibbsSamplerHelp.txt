@@ -1,0 +1,74 @@
+1)Go through the run() function. Read the comments, which describe
+what the algorithm is doing. Make sure you see how the comments
+correspond to the description of the algorithm we saw in class. 
+
+Also, be sure you understand the Sequence class - what are the fields,
+the methods, etc. and how can you access and use them? Note that the
+__init__() function is called every time a new Sequence()
+object is created, and is used to initialize the object as desired.
+Here the Sequence objects are initialized in the readFastaFile() function.
+In this case, __init__(name, seq) fills in the sequence and name fields.
+Then, it initializes the siteScores field, which is a vector of
+the same length as the sequence, whose entries are the odds ratios
+(P under model / P under background) of the motifs that begin at that
+position. We initialize all entries of this vector to 1 (initially 
+Pmodel = Pbackground) except in the positions where the motif cannot
+occur, in which case P = 0. Then a random position is sampled according
+to drawNewMotifSite(), where probability of choosing
+a site is proportional to the odds ratios in self.siteScores
+(therefore, initially uniform).
+
+2) Complete the findSimpleBackgroundModel() function. This just returns
+the overall frequency of each nucleotide in the input sequences. For
+example, if your input file was just
+>seq1
+ATGG
+>seq2
+TTCG
+what should findSimpleBackgroundModel(sequences) return?
+
+3) Complete the drawNewMotifSite() method that is a part of the Sequence
+class. You need to figure out a way to randomly draw from a discrete
+distribution (in this case, the probability of the motif at each position,
+which is given by the normalized self.siteScores vector - the 
+normalization has been done for you). Hint: one easy way to do
+this is to use the method described
+here: http://dept.stat.lsa.umich.edu/~jasoneg/Stat406/lab5.pdf
+
+If this is properly implemented, the __init__() method should be
+drawing uniformly from all possible locations in the sequence when
+it calls drawNewMotifSite(). Later calls of this method
+will use updated siteScores and will be biased towards some
+locations more than others.
+
+4) Complete the buildWeightMatrix() function. This function should loop
+through all the sequences in seqsToScore. You can use getMotif() method
+(without any arguments) to get a particular sequence's current motif
+(current motif location is in Sequence.motif field). Note
+that here you should be using pseudocounts (this was done for you).
+Now for each position in the current motif, add 1 to the appropriate
+location in wmat. You can use the printWeightMatrix()
+function to help you debug this. Remember to normalize your counts to
+get distributions over {A,T,G,C} for each position after getting all
+the counts. Note - it's much easier to test this
+with a small input file!
+
+5) Complete the updateSiteScores() function. When this method is called
+from a particular Sequence object (see run()), this Sequence object's
+siteScores field will be updated to reflect the current
+weight matrix model. For each position in sequence, you need to
+calculate the probability under the weight matrix model Pm and the
+probability under the background Pb. The score is simply the odds
+ratio Pm / Pb. Change the value of self.siteScores to reflect these
+updated values.
+
+6) Implement the calcRelEnt function. Here we assume every position is
+independent, but the background is NOT uniformly distributed across the
+4 bases at each position, so you need to
+use the full formula (given in the HW description and the slides).
+
+7) Uncomment out the print Motif Score line towards the bottom,
+and run the whole thing.
+You'll want to run it for 2000 iterations, so replace run(1) with
+run(2000) at the bottom.
+Now give it a try!
